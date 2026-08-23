@@ -5,13 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WeatherCheck</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
@@ -19,87 +13,77 @@
             color: #fff;
             overflow-x: hidden;
         }
-
         .app-container {
             max-width: 430px;
             margin: 0 auto;
             padding: 20px 16px;
             min-height: 100vh;
         }
-
         .header {
             text-align: center;
             margin-bottom: 24px;
             padding-top: 8px;
         }
+        .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+        .location { font-size: 15px; color: #a0aec0; text-align: center; margin-bottom: 12px; }
 
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
+        .welcome-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 32px 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
+        .welcome-card h2 { font-size: 20px; margin-bottom: 8px; }
+        .welcome-card p { font-size: 14px; color: #a0aec0; margin-bottom: 20px; line-height: 1.5; }
 
-        .location {
-            font-size: 15px;
-            color: #a0aec0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .location-btn {
-            background: rgba(255,255,255,0.1);
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 16px;
             border: none;
-            color: #63b3ed;
-            font-size: 13px;
-            padding: 6px 14px;
-            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 8px;
-            backdrop-filter: blur(10px);
+            margin-bottom: 10px;
             font-family: inherit;
+            transition: transform 0.1s;
         }
-
-        .location-btn:active {
-            transform: scale(0.96);
-        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: #3182ce; color: #fff; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-ghost { background: transparent; color: #a0aec0; font-size: 13px; font-weight: 400; }
 
         .search-box {
             display: flex;
             gap: 8px;
             margin-top: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
         }
-
         .search-box input {
+            flex: 1;
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
-            padding: 8px 16px;
+            border-radius: 16px;
+            padding: 12px 16px;
             color: #fff;
-            font-size: 14px;
+            font-size: 15px;
             font-family: inherit;
-            width: 180px;
             outline: none;
         }
-
-        .search-box input::placeholder {
-            color: #718096;
-        }
-
+        .search-box input::placeholder { color: #718096; }
         .search-box button {
             background: #3182ce;
             border: none;
             color: #fff;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 12px 18px;
+            border-radius: 16px;
+            font-size: 14px;
             cursor: pointer;
             font-family: inherit;
+            font-weight: 600;
         }
 
         .current-weather {
@@ -111,36 +95,11 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.1);
         }
-
-        .weather-icon {
-            font-size: 72px;
-            margin-bottom: 8px;
-            line-height: 1;
-        }
-
-        .temp-main {
-            font-size: 64px;
-            font-weight: 200;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-
-        .temp-main span {
-            font-size: 32px;
-            font-weight: 300;
-            vertical-align: super;
-        }
-
-        .condition-text {
-            font-size: 18px;
-            color: #e2e8f0;
-            margin-bottom: 12px;
-        }
-
-        .feels-like {
-            font-size: 14px;
-            color: #a0aec0;
-        }
+        .weather-icon { font-size: 72px; margin-bottom: 8px; line-height: 1; }
+        .temp-main { font-size: 64px; font-weight: 200; line-height: 1; margin-bottom: 4px; }
+        .temp-main span { font-size: 32px; font-weight: 300; vertical-align: super; }
+        .condition-text { font-size: 18px; color: #e2e8f0; margin-bottom: 12px; }
+        .feels-like { font-size: 14px; color: #a0aec0; }
 
         .rain-alert {
             background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
@@ -152,44 +111,14 @@
             gap: 16px;
             border: 1px solid rgba(99,179,237,0.3);
         }
+        .rain-alert.dry { background: linear-gradient(135deg, #38a169 0%, #276749 100%); border: 1px solid rgba(104,211,145,0.3); }
+        .rain-icon { font-size: 40px; flex-shrink: 0; }
+        .rain-info h3 { font-size: 16px; margin-bottom: 4px; }
+        .rain-info p { font-size: 13px; color: #e2e8f0; line-height: 1.4; }
 
-        .rain-alert.dry {
-            background: linear-gradient(135deg, #38a169 0%, #276749 100%);
-            border: 1px solid rgba(104,211,145,0.3);
-        }
+        .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #a0aec0; margin-bottom: 12px; margin-top: 24px; }
 
-        .rain-icon {
-            font-size: 40px;
-            flex-shrink: 0;
-        }
-
-        .rain-info h3 {
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .rain-info p {
-            font-size: 13px;
-            color: #e2e8f0;
-            line-height: 1.4;
-        }
-
-        .section-title {
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #a0aec0;
-            margin-bottom: 12px;
-            margin-top: 24px;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
+        .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .card {
             background: rgba(255,255,255,0.06);
             border-radius: 20px;
@@ -198,49 +127,13 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.08);
         }
-
-        .card-icon {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        .card-label {
-            font-size: 11px;
-            color: #a0aec0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-
-        .card-value {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .card-status {
-            font-size: 12px;
-            padding: 3px 10px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 4px;
-            font-weight: 500;
-        }
-
-        .status-good {
-            background: rgba(72,187,120,0.2);
-            color: #68d391;
-        }
-
-        .status-moderate {
-            background: rgba(236,201,75,0.2);
-            color: #f6e05e;
-        }
-
-        .status-bad {
-            background: rgba(245,101,101,0.2);
-            color: #fc8181;
-        }
+        .card-icon { font-size: 28px; margin-bottom: 8px; }
+        .card-label { font-size: 11px; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .card-value { font-size: 22px; font-weight: 600; margin-bottom: 2px; }
+        .card-status { font-size: 12px; padding: 3px 10px; border-radius: 12px; display: inline-block; margin-top: 4px; font-weight: 500; }
+        .status-good { background: rgba(72,187,120,0.2); color: #68d391; }
+        .status-moderate { background: rgba(236,201,75,0.2); color: #f6e05e; }
+        .status-bad { background: rgba(245,101,101,0.2); color: #fc8181; }
 
         .hourly-rain {
             background: rgba(255,255,255,0.06);
@@ -249,47 +142,12 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.08);
         }
-
-        .hourly-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .hourly-row:last-child {
-            border-bottom: none;
-        }
-
-        .hour-time {
-            font-size: 14px;
-            color: #cbd5e0;
-            width: 60px;
-        }
-
-        .hour-bar-container {
-            flex: 1;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            margin: 0 12px;
-            overflow: hidden;
-        }
-
-        .hour-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #63b3ed, #4299e1);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        .hour-pct {
-            font-size: 13px;
-            color: #a0aec0;
-            width: 40px;
-            text-align: right;
-        }
+        .hourly-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .hourly-row:last-child { border-bottom: none; }
+        .hour-time { font-size: 14px; color: #cbd5e0; width: 60px; }
+        .hour-bar-container { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 0 12px; overflow: hidden; }
+        .hour-bar { height: 100%; background: linear-gradient(90deg, #63b3ed, #4299e1); border-radius: 4px; transition: width 0.5s ease; }
+        .hour-pct { font-size: 13px; color: #a0aec0; width: 40px; text-align: right; }
 
         .exercise-card {
             background: rgba(255,255,255,0.06);
@@ -298,79 +156,26 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.08);
         }
+        .exercise-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .exercise-header .icon { font-size: 32px; }
+        .exercise-header h3 { font-size: 16px; }
+        .exercise-header p { font-size: 12px; color: #a0aec0; }
+        .exercise-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .ex-metric { text-align: center; padding: 10px; background: rgba(255,255,255,0.04); border-radius: 14px; }
+        .ex-metric-value { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
+        .ex-metric-label { font-size: 10px; color: #a0aec0; text-transform: uppercase; }
+        .exercise-verdict { margin-top: 14px; padding: 12px; border-radius: 14px; text-align: center; font-size: 14px; font-weight: 500; }
 
-        .exercise-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .exercise-header .icon {
-            font-size: 32px;
-        }
-
-        .exercise-header h3 {
-            font-size: 16px;
-        }
-
-        .exercise-header p {
-            font-size: 12px;
-            color: #a0aec0;
-        }
-
-        .exercise-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-        }
-
-        .ex-metric {
-            text-align: center;
-            padding: 10px;
-            background: rgba(255,255,255,0.04);
-            border-radius: 14px;
-        }
-
-        .ex-metric-value {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .ex-metric-label {
-            font-size: 10px;
-            color: #a0aec0;
-            text-transform: uppercase;
-        }
-
-        .exercise-verdict {
-            margin-top: 14px;
-            padding: 12px;
-            border-radius: 14px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
+        .loading { text-align: center; padding: 60px 20px; }
         .loading-spinner {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border: 3px solid rgba(255,255,255,0.1);
             border-top-color: #63b3ed;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 16px;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .error-msg {
             background: rgba(245,101,101,0.15);
@@ -380,7 +185,6 @@
             text-align: center;
             margin: 40px 20px;
         }
-
         .error-msg button {
             margin-top: 12px;
             background: #e53e3e;
@@ -392,53 +196,26 @@
             cursor: pointer;
             font-family: inherit;
         }
+        .update-time { text-align: center; font-size: 11px; color: #718096; margin-top: 20px; margin-bottom: 30px; }
+        .aqi-detail { font-size: 11px; color: #a0aec0; margin-top: 4px; }
+        .uv-detail { font-size: 11px; color: #a0aec0; margin-top: 4px; }
 
-        .update-time {
-            text-align: center;
-            font-size: 11px;
-            color: #718096;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-
-        .aqi-detail {
-            font-size: 11px;
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .top-bar button {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
             color: #a0aec0;
-            margin-top: 4px;
-        }
-
-        .uv-detail {
-            font-size: 11px;
-            color: #a0aec0;
-            margin-top: 4px;
-        }
-
-        .debug-info {
-            background: rgba(255,255,255,0.04);
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 16px;
-            font-size: 11px;
-            color: #718096;
-            font-family: monospace;
-            text-align: left;
-            line-height: 1.5;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         @media (max-width: 380px) {
-            .cards-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-            .card {
-                padding: 14px 10px;
-            }
-            .temp-main {
-                font-size: 52px;
-            }
-            .search-box input {
-                width: 140px;
-            }
+            .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .card { padding: 14px 10px; }
+            .temp-main { font-size: 52px; }
         }
     </style>
 <base target="_blank">
@@ -447,21 +224,9 @@
     <div class="app-container">
         <div class="header">
             <h1>WeatherCheck</h1>
-            <div class="location" id="locationText">Detecting location...</div>
-            <button class="location-btn" onclick="getLocation()">📍 Use My Location</button>
-            <div class="search-box">
-                <input type="text" id="cityInput" placeholder="Or type a city..." onkeypress="if(event.key==='Enter')searchCity()">
-                <button onclick="searchCity()">Search</button>
-            </div>
+            <div class="location" id="locationText">Ready when you are</div>
         </div>
-
-        <div id="content">
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                <p id="loadingText">Getting your weather...</p>
-            </div>
-        </div>
-
+        <div id="content"></div>
         <div class="update-time" id="updateTime"></div>
     </div>
 
@@ -469,12 +234,6 @@
         let lat = 40.7128;
         let lon = -74.0060;
         let cityName = "New York, NY";
-        let debugLog = [];
-
-        function log(msg) {
-            console.log("[WeatherApp] " + msg);
-            debugLog.push(msg);
-        }
 
         const weatherCodes = {
             0: { icon: "☀️", text: "Clear sky" },
@@ -503,40 +262,64 @@
             99: { icon: "⛈️", text: "Heavy thunderstorm" }
         };
 
+        // Show welcome screen immediately — NO auto-loading
+        function showWelcome() {
+            document.getElementById("content").innerHTML = `
+                <div class="welcome-card">
+                    <h2>🌤️ Get Your Local Weather</h2>
+                    <p>Choose how you want to load weather data. You can always change this later.</p>
+                    <button class="btn btn-primary" onclick="getLocation()">📍 Use My Location</button>
+                    <div class="search-box">
+                        <input type="text" id="cityInput" placeholder="Search city (e.g. Austin, TX)" onkeypress="if(event.key==='Enter')searchCity()">
+                        <button onclick="searchCity()">Go</button>
+                    </div>
+                    <button class="btn btn-ghost" onclick="useDefault()">Skip & use New York, NY</button>
+                </div>
+            `;
+            document.getElementById("updateTime").textContent = "";
+        }
+
+        function useDefault() {
+            lat = 40.7128;
+            lon = -74.0060;
+            cityName = "New York, NY";
+            fetchWeather();
+        }
+
         function getLocation() {
-            log("getLocation() called");
             if (!navigator.geolocation) {
-                log("Geolocation not supported by browser");
-                document.getElementById("locationText").textContent = "Geolocation not supported — using default (NYC)";
-                fetchWeather();
+                document.getElementById("locationText").textContent = "Geolocation not supported";
+                showError("Your browser doesn't support geolocation. Try searching for a city instead.");
                 return;
             }
 
-            document.getElementById("locationText").textContent = "Locating you... (this may take 5–10 seconds)";
-            document.getElementById("loadingText").textContent = "Getting your location...";
+            setLoading("Finding your location...");
+            document.getElementById("locationText").textContent = "Locating...";
+
+            // Hard 8-second fallback timer
+            const fallbackTimer = setTimeout(() => {
+                document.getElementById("locationText").textContent = "Location timed out";
+                showError("Location took too long. Try searching for your city, or check that location services are enabled in your phone settings.");
+            }, 8000);
 
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
+                    clearTimeout(fallbackTimer);
                     lat = pos.coords.latitude;
                     lon = pos.coords.longitude;
-                    log("Location success: " + lat + ", " + lon + " (accuracy: " + pos.coords.accuracy + "m)");
                     cityName = "Your Location";
                     fetchWeather();
                 },
                 (err) => {
-                    log("Location error: " + err.code + " — " + err.message);
-                    let errMsg = "Location error (code " + err.code + "): " + err.message;
-                    if (err.code === 1) errMsg = "Location permission denied — using default (NYC). Tap the button below to allow.";
-                    if (err.code === 2) errMsg = "Location unavailable — using default (NYC). Try searching for your city instead.";
-                    if (err.code === 3) errMsg = "Location timed out — using default (NYC). Try searching for your city instead.";
-                    document.getElementById("locationText").textContent = errMsg;
-                    fetchWeather();
+                    clearTimeout(fallbackTimer);
+                    let msg = "Could not get location.";
+                    if (err.code === 1) msg = "Location permission denied. Check your browser/phone settings and allow location access, or search for a city.";
+                    if (err.code === 2) msg = "Location unavailable. Try searching for a city instead.";
+                    if (err.code === 3) msg = "Location timed out. Try searching for a city instead.";
+                    document.getElementById("locationText").textContent = "Location failed";
+                    showError(msg);
                 },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 15000,
-                    maximumAge: 0
-                }
+                { enableHighAccuracy: false, timeout: 7000, maximumAge: 60000 }
             );
         }
 
@@ -544,95 +327,69 @@
             const query = document.getElementById("cityInput").value.trim();
             if (!query) return;
 
-            log("Searching city: " + query);
-            document.getElementById("locationText").textContent = "Searching for "" + query + ""...";
-            document.getElementById("content").innerHTML = `
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Searching city...</p>
-                </div>
-            `;
+            setLoading("Searching...");
+            document.getElementById("locationText").textContent = "Searching...";
 
             try {
-                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`);
+                const res = await fetchWithTimeout(
+                    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`,
+                    {}, 8000
+                );
                 const data = await res.json();
 
                 if (!data.results || data.results.length === 0) {
                     throw new Error("City not found");
                 }
 
-                const result = data.results[0];
-                lat = result.latitude;
-                lon = result.longitude;
-                cityName = result.name + (result.admin1 ? ", " + result.admin1 : "") + (result.country ? ", " + result.country : "");
-                log("City found: " + cityName + " at " + lat + ", " + lon);
+                const r = data.results[0];
+                lat = r.latitude;
+                lon = r.longitude;
+                cityName = r.name + (r.admin1 ? ", " + r.admin1 : "") + (r.country ? ", " + r.country : "");
                 fetchWeather();
             } catch (err) {
-                log("City search error: " + err.message);
-                document.getElementById("content").innerHTML = `
-                    <div class="error-msg">
-                        <p>⚠️ Could not find city "${query}"</p>
-                        <button onclick="fetchWeather()">Back to Weather</button>
-                    </div>
-                `;
+                document.getElementById("locationText").textContent = "Search failed";
+                showError(`Could not find "${query}". Try a different spelling or include the state/country.`);
             }
         }
 
         async function fetchWeather() {
-            log("fetchWeather() called for " + lat + ", " + lon);
-            document.getElementById("loadingText").textContent = "Loading weather data...";
+            setLoading("Loading weather data...");
+            document.getElementById("locationText").textContent = "Loading...";
 
             try {
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,visibility&hourly=temperature_2m,precipitation_probability,weather_code,uv_index&daily=uv_index_max&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto`;
 
-                log("Fetching: " + url.substring(0, 80) + "...");
-                const res = await fetch(url);
-                log("Response status: " + res.status);
-
-                if (!res.ok) throw new Error("Weather API returned " + res.status);
+                const res = await fetchWithTimeout(url, {}, 10000);
+                if (!res.ok) throw new Error("Weather API error: " + res.status);
                 const data = await res.json();
-                log("Weather data received successfully");
 
-                // Only try reverse geocoding if we don't already have a city name
+                // Try to get city name if we only have coordinates
                 if (cityName === "Your Location") {
                     try {
-                        const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
+                        const geoRes = await fetchWithTimeout(
+                            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
+                            {}, 5000
+                        );
                         const geoData = await geoRes.json();
                         cityName = geoData.city || geoData.locality || geoData.principalSubdivision || "Your Location";
-                        log("Reverse geocode: " + cityName);
                     } catch(e) {
-                        log("Reverse geocode failed: " + e.message);
                         cityName = "Your Location";
                     }
                 }
 
                 render(data);
             } catch (err) {
-                log("Weather fetch error: " + err.message);
-                document.getElementById("content").innerHTML = `
-                    <div class="error-msg">
-                        <p>⚠️ Could not load weather data</p>
-                        <p style="font-size:13px;color:#a0aec0;margin-top:8px;">${err.message}</p>
-                        <button onclick="fetchWeather()">Try Again</button>
-                        <div class="debug-info">
-                            <strong>Debug info:</strong><br>
-                            Lat: ${lat}<br>
-                            Lon: ${lon}<br>
-                            ${debugLog.join("<br>")}
-                        </div>
-                    </div>
-                `;
+                document.getElementById("locationText").textContent = "Error";
+                showError("Could not load weather: " + err.message + ". Check your internet connection and try again.");
             }
         }
 
         function render(data) {
-            log("render() called");
             const current = data.current;
             const hourly = data.hourly;
             const daily = data.daily;
             const wCode = weatherCodes[current.weather_code] || { icon: "🌡️", text: "Unknown" };
 
-            // Get next 6 hours
             const now = new Date();
             const next6Hours = [];
             for (let i = 0; i < 6; i++) {
@@ -644,11 +401,9 @@
                 });
             }
 
-            // Rain decision
             const maxRain = Math.max(...next6Hours.map(h => h.prob));
             const rainAlert = maxRain > 40;
 
-            // Exercise conditions
             const feelsLike = Math.round(current.apparent_temperature);
             const windSpeed = Math.round(current.wind_speed_10m);
             const visibilityKm = current.visibility ? (current.visibility / 1000).toFixed(1) : "--";
@@ -656,29 +411,15 @@
 
             let exerciseGood = true;
             let exerciseReasons = [];
-
-            if (feelsLike < 35 || feelsLike > 85) {
-                exerciseGood = false;
-                exerciseReasons.push(feelsLike < 35 ? "too cold" : "too hot");
-            }
-            if (windSpeed > 20) {
-                exerciseGood = false;
-                exerciseReasons.push("too windy");
-            }
-            if (visibilityKm < 1) {
-                exerciseGood = false;
-                exerciseReasons.push("poor visibility");
-            }
-            if (maxRain > 50) {
-                exerciseGood = false;
-                exerciseReasons.push("rain likely");
-            }
+            if (feelsLike < 35 || feelsLike > 85) { exerciseGood = false; exerciseReasons.push(feelsLike < 35 ? "too cold" : "too hot"); }
+            if (windSpeed > 20) { exerciseGood = false; exerciseReasons.push("too windy"); }
+            if (visibilityKm < 1) { exerciseGood = false; exerciseReasons.push("poor visibility"); }
+            if (maxRain > 50) { exerciseGood = false; exerciseReasons.push("rain likely"); }
 
             const exerciseVerdict = exerciseGood 
                 ? { text: "✅ Great conditions for outdoor exercise!", class: "status-good" }
                 : { text: `⚠️ Not ideal — ${exerciseReasons.join(", ")}`, class: "status-bad" };
 
-            // UV & Health
             let uvStatus, uvClass, uvAdvice;
             if (uvMax <= 2) { uvStatus = "Low"; uvClass = "status-good"; uvAdvice = "Minimal protection needed"; }
             else if (uvMax <= 5) { uvStatus = "Moderate"; uvClass = "status-moderate"; uvAdvice = "Wear sunscreen if outside"; }
@@ -686,10 +427,7 @@
             else if (uvMax <= 10) { uvStatus = "Very High"; uvClass = "status-bad"; uvAdvice = "Limit sun exposure"; }
             else { uvStatus = "Extreme"; uvClass = "status-bad"; uvAdvice = "Avoid midday sun"; }
 
-            // AQI estimate based on visibility
-            let aqiEst = "--";
-            let aqiStatus = "--";
-            let aqiClass = "status-good";
+            let aqiEst = "--", aqiStatus = "--", aqiClass = "status-good";
             if (current.visibility) {
                 const vis = current.visibility / 1000;
                 if (vis > 15) { aqiEst = "0-50"; aqiStatus = "Good"; aqiClass = "status-good"; }
@@ -701,6 +439,10 @@
             document.getElementById("locationText").innerHTML = `📍 ${cityName}`;
 
             document.getElementById("content").innerHTML = `
+                <div class="top-bar">
+                    <button onclick="showWelcome()">← Change Location</button>
+                </div>
+
                 <div class="current-weather">
                     <div class="weather-icon">${wCode.icon}</div>
                     <div class="temp-main">${Math.round(current.temperature_2m)}<span>°F</span></div>
@@ -776,18 +518,44 @@
                         <div class="aqi-detail">${current.visibility ? `Vis: ${visibilityKm} mi` : "No data"}</div>
                     </div>
                 </div>
-
-                <div class="debug-info">
-                    <strong>Debug:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)} | ${debugLog.slice(-3).join(" | ")}
-                </div>
             `;
 
             document.getElementById("updateTime").textContent = `Updated: ${now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
         }
 
-        // Auto-load on page open
-        log("App started");
-        getLocation();
+        function setLoading(text) {
+            document.getElementById("content").innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>${text}</p>
+                </div>
+            `;
+        }
+
+        function showError(msg) {
+            document.getElementById("content").innerHTML = `
+                <div class="error-msg">
+                    <p>⚠️ ${msg}</p>
+                    <button onclick="showWelcome()">Back to Start</button>
+                </div>
+            `;
+        }
+
+        async function fetchWithTimeout(url, options, timeoutMs) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const response = await fetch(url, { ...options, signal: controller.signal });
+                clearTimeout(id);
+                return response;
+            } catch (error) {
+                clearTimeout(id);
+                throw error;
+            }
+        }
+
+        // Start with welcome screen — user must choose an action
+        showWelcome();
     </script>
 </body>
 </html>
