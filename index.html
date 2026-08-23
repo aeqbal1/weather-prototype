@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WeatherCheck</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-top: 8px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .location {
+            font-size: 15px;
+            color: #a0aec0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .location-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #63b3ed;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .current-weather {
+            background: rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 28px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .weather-icon {
+            font-size: 72px;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .temp-main {
+            font-size: 64px;
+            font-weight: 200;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .temp-main span {
+            font-size: 32px;
+            font-weight: 300;
+            vertical-align: super;
+        }
+
+        .condition-text {
+            font-size: 18px;
+            color: #e2e8f0;
+            margin-bottom: 12px;
+        }
+
+        .feels-like {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+
+        .rain-alert {
+            background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid rgba(99,179,237,0.3);
+        }
+
+        .rain-alert.dry {
+            background: linear-gradient(135deg, #38a169 0%, #276749 100%);
+            border: 1px solid rgba(104,211,145,0.3);
+        }
+
+        .rain-icon {
+            font-size: 40px;
+            flex-shrink: 0;
+        }
+
+        .rain-info h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .rain-info p {
+            font-size: 13px;
+            color: #e2e8f0;
+            line-height: 1.4;
+        }
+
+        .section-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #a0aec0;
+            margin-bottom: 12px;
+            margin-top: 24px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 18px 14px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .card-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .card-label {
+            font-size: 11px;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .card-value {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .card-status {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .status-good {
+            background: rgba(72,187,120,0.2);
+            color: #68d391;
+        }
+
+        .status-moderate {
+            background: rgba(236,201,75,0.2);
+            color: #f6e05e;
+        }
+
+        .status-bad {
+            background: rgba(245,101,101,0.2);
+            color: #fc8181;
+        }
+
+        .hourly-rain {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .hourly-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .hourly-row:last-child {
+            border-bottom: none;
+        }
+
+        .hour-time {
+            font-size: 14px;
+            color: #cbd5e0;
+            width: 60px;
+        }
+
+        .hour-bar-container {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin: 0 12px;
+            overflow: hidden;
+        }
+
+        .hour-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #63b3ed, #4299e1);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .hour-pct {
+            font-size: 13px;
+            color: #a0aec0;
+            width: 40px;
+            text-align: right;
+        }
+
+        .exercise-card {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .exercise-header .icon {
+            font-size: 32px;
+        }
+
+        .exercise-header h3 {
+            font-size: 16px;
+        }
+
+        .exercise-header p {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        .exercise-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .ex-metric {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 14px;
+        }
+
+        .ex-metric-value {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .ex-metric-label {
+            font-size: 10px;
+            color: #a0aec0;
+            text-transform: uppercase;
+        }
+
+        .exercise-verdict {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #63b3ed;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-msg {
+            background: rgba(245,101,101,0.15);
+            border: 1px solid rgba(245,101,101,0.3);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin: 40px 20px;
+        }
+
+        .error-msg button {
+            margin-top: 12px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .update-time {
+            text-align: center;
+            font-size: 11px;
+            color: #718096;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .aqi-detail {
+            font-size: 11px;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        .uv-detail {
+            font-size: 11px;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 380px) {
+            .cards-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .card {
+                padding: 14px 10px;
+            }
+            .temp-main {
+                font-size: 52px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>WeatherCheck</h1>
+            <div class="location" id="locationText">Detecting location...</div>
+            <button class="location-btn" onclick="getLocation()">📍 Use My Location</button>
+        </div>
+
+        <div id="content">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Getting your weather...</p>
+            </div>
+        </div>
+
+        <div class="update-time" id="updateTime"></div>
+    </div>
+
+    <script>
+        let lat = 40.7128; // Default: NYC
+        let lon = -74.0060;
+        let cityName = "New York, NY";
+
+        const weatherCodes = {
+            0: { icon: "☀️", text: "Clear sky" },
+            1: { icon: "🌤️", text: "Mainly clear" },
+            2: { icon: "⛅", text: "Partly cloudy" },
+            3: { icon: "☁️", text: "Overcast" },
+            45: { icon: "🌫️", text: "Foggy" },
+            48: { icon: "🌫️", text: "Depositing rime fog" },
+            51: { icon: "🌦️", text: "Light drizzle" },
+            53: { icon: "🌦️", text: "Moderate drizzle" },
+            55: { icon: "🌧️", text: "Dense drizzle" },
+            61: { icon: "🌧️", text: "Slight rain" },
+            63: { icon: "🌧️", text: "Moderate rain" },
+            65: { icon: "🌧️", text: "Heavy rain" },
+            71: { icon: "🌨️", text: "Slight snow" },
+            73: { icon: "🌨️", text: "Moderate snow" },
+            75: { icon: "❄️", text: "Heavy snow" },
+            77: { icon: "🌨️", text: "Snow grains" },
+            80: { icon: "🌦️", text: "Slight rain showers" },
+            81: { icon: "🌧️", text: "Moderate rain showers" },
+            82: { icon: "⛈️", text: "Violent rain showers" },
+            85: { icon: "🌨️", text: "Slight snow showers" },
+            86: { icon: "❄️", text: "Heavy snow showers" },
+            95: { icon: "⛈️", text: "Thunderstorm" },
+            96: { icon: "⛈️", text: "Thunderstorm with hail" },
+            99: { icon: "⛈️", text: "Heavy thunderstorm" }
+        };
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                document.getElementById("locationText").textContent = "Locating...";
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        lat = pos.coords.latitude;
+                        lon = pos.coords.longitude;
+                        cityName = "Your Location";
+                        fetchWeather();
+                    },
+                    (err) => {
+                        document.getElementById("locationText").textContent = "Location denied - using default";
+                        fetchWeather();
+                    }
+                );
+            } else {
+                fetchWeather();
+            }
+        }
+
+        async function fetchWeather() {
+            try {
+                // Fetch current, hourly, and daily data from Open-Meteo
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,visibility&hourly=temperature_2m,precipitation_probability,weather_code,uv_index&daily=uv_index_max&timezone=auto`;
+
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("Weather service unavailable");
+                const data = await res.json();
+
+                // Try to get city name from reverse geocoding
+                try {
+                    const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
+                    const geoData = await geoRes.json();
+                    cityName = geoData.city || geoData.locality || geoData.principalSubdivision || "Your Location";
+                } catch(e) {
+                    cityName = cityName;
+                }
+
+                render(data);
+            } catch (err) {
+                document.getElementById("content").innerHTML = `
+                    <div class="error-msg">
+                        <p>⚠️ Could not load weather data</p>
+                        <p style="font-size:13px;color:#a0aec0;margin-top:8px;">${err.message}</p>
+                        <button onclick="fetchWeather()">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        function render(data) {
+            const current = data.current;
+            const hourly = data.hourly;
+            const daily = data.daily;
+            const wCode = weatherCodes[current.weather_code] || { icon: "🌡️", text: "Unknown" };
+
+            // Get next 6 hours
+            const now = new Date();
+            const currentHour = now.getHours();
+            const next6Hours = [];
+            for (let i = 0; i < 6; i++) {
+                const hIdx = i;
+                const hourTime = new Date(now.getTime() + i * 3600000);
+                next6Hours.push({
+                    time: i === 0 ? "Now" : hourTime.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }),
+                    prob: hourly.precipitation_probability[i],
+                    temp: Math.round(hourly.temperature_2m[i])
+                });
+            }
+
+            // Rain decision
+            const maxRain = Math.max(...next6Hours.map(h => h.prob));
+            const rainAlert = maxRain > 40;
+
+            // Exercise conditions
+            const feelsLike = Math.round(current.apparent_temperature);
+            const windSpeed = Math.round(current.wind_speed_10m);
+            const visibilityKm = current.visibility ? (current.visibility / 1000).toFixed(1) : "--";
+            const uvMax = daily.uv_index_max[0];
+
+            let exerciseGood = true;
+            let exerciseReasons = [];
+
+            if (feelsLike < 35 || feelsLike > 85) {
+                exerciseGood = false;
+                exerciseReasons.push(feelsLike < 35 ? "too cold" : "too hot");
+            }
+            if (windSpeed > 20) {
+                exerciseGood = false;
+                exerciseReasons.push("too windy");
+            }
+            if (visibilityKm < 1) {
+                exerciseGood = false;
+                exerciseReasons.push("poor visibility");
+            }
+            if (maxRain > 50) {
+                exerciseGood = false;
+                exerciseReasons.push("rain likely");
+            }
+
+            const exerciseVerdict = exerciseGood 
+                ? { text: "✅ Great conditions for outdoor exercise!", class: "status-good" }
+                : { text: `⚠️ Not ideal — ${exerciseReasons.join(", ")}`, class: "status-bad" };
+
+            // UV & Health
+            let uvStatus, uvClass, uvAdvice;
+            if (uvMax <= 2) { uvStatus = "Low"; uvClass = "status-good"; uvAdvice = "Minimal protection needed"; }
+            else if (uvMax <= 5) { uvStatus = "Moderate"; uvClass = "status-moderate"; uvAdvice = "Wear sunscreen if outside"; }
+            else if (uvMax <= 7) { uvStatus = "High"; uvClass = "status-bad"; uvAdvice = "SPF 30+ recommended"; }
+            else if (uvMax <= 10) { uvStatus = "Very High"; uvClass = "status-bad"; uvAdvice = "Limit sun exposure"; }
+            else { uvStatus = "Extreme"; uvClass = "status-bad"; uvAdvice = "Avoid midday sun"; }
+
+            // AQI estimate based on visibility (rough proxy)
+            let aqiEst = "--";
+            let aqiStatus = "--";
+            let aqiClass = "status-good";
+            if (current.visibility) {
+                const vis = current.visibility / 1000;
+                if (vis > 15) { aqiEst = "0-50"; aqiStatus = "Good"; aqiClass = "status-good"; }
+                else if (vis > 10) { aqiEst = "51-100"; aqiStatus = "Moderate"; aqiClass = "status-moderate"; }
+                else if (vis > 5) { aqiEst = "101-150"; aqiStatus = "Unhealthy for Sensitive"; aqiClass = "status-bad"; }
+                else { aqiEst = "150+"; aqiStatus = "Unhealthy"; aqiClass = "status-bad"; }
+            }
+
+            document.getElementById("locationText").innerHTML = `📍 ${cityName}`;
+
+            document.getElementById("content").innerHTML = `
+                <div class="current-weather">
+                    <div class="weather-icon">${wCode.icon}</div>
+                    <div class="temp-main">${Math.round(current.temperature_2m)}<span>°F</span></div>
+                    <div class="condition-text">${wCode.text}</div>
+                    <div class="feels-like">Feels like ${feelsLike}°F • Humidity ${current.relative_humidity_2m}%</div>
+                </div>
+
+                <div class="rain-alert ${rainAlert ? '' : 'dry'}">
+                    <div class="rain-icon">${rainAlert ? '☔' : '🌂'}</div>
+                    <div class="rain-info">
+                        <h3>${rainAlert ? 'Bring an umbrella!' : 'No umbrella needed'}</h3>
+                        <p>${rainAlert 
+                            ? `Highest rain chance in next 6 hours: ${maxRain}%` 
+                            : `Rain chance stays below ${maxRain}% for the next 6 hours.`}</p>
+                    </div>
+                </div>
+
+                <div class="hourly-rain">
+                    <div style="font-size:14px;font-weight:600;margin-bottom:12px;">🌧️ Rain Chance Next 6 Hours</div>
+                    ${next6Hours.map(h => `
+                        <div class="hourly-row">
+                            <span class="hour-time">${h.time}</span>
+                            <div class="hour-bar-container">
+                                <div class="hour-bar" style="width: ${h.prob}%"></div>
+                            </div>
+                            <span class="hour-pct">${h.prob}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="section-title">Outdoor Exercise</div>
+                <div class="exercise-card">
+                    <div class="exercise-header">
+                        <div class="icon">🏃</div>
+                        <div>
+                            <h3>Running & Cycling Conditions</h3>
+                            <p>Based on feels-like temp, wind, visibility & rain</p>
+                        </div>
+                    </div>
+                    <div class="exercise-metrics">
+                        <div class="ex-metric">
+                            <div class="ex-metric-value">${feelsLike}°</div>
+                            <div class="ex-metric-label">Feels Like</div>
+                        </div>
+                        <div class="ex-metric">
+                            <div class="ex-metric-value">${windSpeed}</div>
+                            <div class="ex-metric-label">Wind (mph)</div>
+                        </div>
+                        <div class="ex-metric">
+                            <div class="ex-metric-value">${visibilityKm}</div>
+                            <div class="ex-metric-label">Visibility (mi)</div>
+                        </div>
+                    </div>
+                    <div class="exercise-verdict ${exerciseVerdict.class}">
+                        ${exerciseVerdict.text}
+                    </div>
+                </div>
+
+                <div class="section-title">Health & Safety</div>
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon">☀️</div>
+                        <div class="card-label">UV Index (Max)</div>
+                        <div class="card-value">${uvMax}</div>
+                        <span class="card-status ${uvClass}">${uvStatus}</span>
+                        <div class="uv-detail">${uvAdvice}</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🫁</div>
+                        <div class="card-label">Air Quality</div>
+                        <div class="card-value">${aqiStatus}</div>
+                        <span class="card-status ${aqiClass}">${aqiEst === "--" ? "N/A" : "AQI " + aqiEst}</span>
+                        <div class="aqi-detail">${current.visibility ? `Vis: ${visibilityKm} mi` : "No data"}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("updateTime").textContent = `Updated: ${now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+        }
+
+        // Auto-load on page open
+        getLocation();
+    </script>
+</body>
+</html>
