@@ -47,6 +47,7 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+            flex-wrap: wrap;
         }
 
         .location-btn {
@@ -54,11 +55,51 @@
             border: none;
             color: #63b3ed;
             font-size: 13px;
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             cursor: pointer;
             margin-top: 8px;
             backdrop-filter: blur(10px);
+            font-family: inherit;
+        }
+
+        .location-btn:active {
+            transform: scale(0.96);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            width: 180px;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: #718096;
+        }
+
+        .search-box button {
+            background: #3182ce;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .current-weather {
@@ -349,6 +390,7 @@
             border-radius: 20px;
             font-size: 14px;
             cursor: pointer;
+            font-family: inherit;
         }
 
         .update-time {
@@ -371,6 +413,18 @@
             margin-top: 4px;
         }
 
+        .debug-info {
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 16px;
+            font-size: 11px;
+            color: #718096;
+            font-family: monospace;
+            text-align: left;
+            line-height: 1.5;
+        }
+
         @media (max-width: 380px) {
             .cards-grid {
                 grid-template-columns: 1fr 1fr;
@@ -382,8 +436,12 @@
             .temp-main {
                 font-size: 52px;
             }
+            .search-box input {
+                width: 140px;
+            }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
     <div class="app-container">
@@ -391,12 +449,16 @@
             <h1>WeatherCheck</h1>
             <div class="location" id="locationText">Detecting location...</div>
             <button class="location-btn" onclick="getLocation()">📍 Use My Location</button>
+            <div class="search-box">
+                <input type="text" id="cityInput" placeholder="Or type a city..." onkeypress="if(event.key==='Enter')searchCity()">
+                <button onclick="searchCity()">Search</button>
+            </div>
         </div>
 
         <div id="content">
             <div class="loading">
                 <div class="loading-spinner"></div>
-                <p>Getting your weather...</p>
+                <p id="loadingText">Getting your weather...</p>
             </div>
         </div>
 
@@ -404,9 +466,15 @@
     </div>
 
     <script>
-        let lat = 40.7128; // Default: NYC
+        let lat = 40.7128;
         let lon = -74.0060;
         let cityName = "New York, NY";
+        let debugLog = [];
+
+        function log(msg) {
+            console.log("[WeatherApp] " + msg);
+            debugLog.push(msg);
+        }
 
         const weatherCodes = {
             0: { icon: "☀️", text: "Clear sky" },
@@ -436,56 +504,129 @@
         };
 
         function getLocation() {
-            if (navigator.geolocation) {
-                document.getElementById("locationText").textContent = "Locating...";
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        lat = pos.coords.latitude;
-                        lon = pos.coords.longitude;
-                        cityName = "Your Location";
-                        fetchWeather();
-                    },
-                    (err) => {
-                        document.getElementById("locationText").textContent = "Location denied - using default";
-                        fetchWeather();
-                    }
-                );
-            } else {
+            log("getLocation() called");
+            if (!navigator.geolocation) {
+                log("Geolocation not supported by browser");
+                document.getElementById("locationText").textContent = "Geolocation not supported — using default (NYC)";
                 fetchWeather();
+                return;
+            }
+
+            document.getElementById("locationText").textContent = "Locating you... (this may take 5–10 seconds)";
+            document.getElementById("loadingText").textContent = "Getting your location...";
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    lat = pos.coords.latitude;
+                    lon = pos.coords.longitude;
+                    log("Location success: " + lat + ", " + lon + " (accuracy: " + pos.coords.accuracy + "m)");
+                    cityName = "Your Location";
+                    fetchWeather();
+                },
+                (err) => {
+                    log("Location error: " + err.code + " — " + err.message);
+                    let errMsg = "Location error (code " + err.code + "): " + err.message;
+                    if (err.code === 1) errMsg = "Location permission denied — using default (NYC). Tap the button below to allow.";
+                    if (err.code === 2) errMsg = "Location unavailable — using default (NYC). Try searching for your city instead.";
+                    if (err.code === 3) errMsg = "Location timed out — using default (NYC). Try searching for your city instead.";
+                    document.getElementById("locationText").textContent = errMsg;
+                    fetchWeather();
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        async function searchCity() {
+            const query = document.getElementById("cityInput").value.trim();
+            if (!query) return;
+
+            log("Searching city: " + query);
+            document.getElementById("locationText").textContent = "Searching for "" + query + ""...";
+            document.getElementById("content").innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Searching city...</p>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`);
+                const data = await res.json();
+
+                if (!data.results || data.results.length === 0) {
+                    throw new Error("City not found");
+                }
+
+                const result = data.results[0];
+                lat = result.latitude;
+                lon = result.longitude;
+                cityName = result.name + (result.admin1 ? ", " + result.admin1 : "") + (result.country ? ", " + result.country : "");
+                log("City found: " + cityName + " at " + lat + ", " + lon);
+                fetchWeather();
+            } catch (err) {
+                log("City search error: " + err.message);
+                document.getElementById("content").innerHTML = `
+                    <div class="error-msg">
+                        <p>⚠️ Could not find city "${query}"</p>
+                        <button onclick="fetchWeather()">Back to Weather</button>
+                    </div>
+                `;
             }
         }
 
         async function fetchWeather() {
+            log("fetchWeather() called for " + lat + ", " + lon);
+            document.getElementById("loadingText").textContent = "Loading weather data...";
+
             try {
-                // Fetch current, hourly, and daily data from Open-Meteo
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,visibility&hourly=temperature_2m,precipitation_probability,weather_code,uv_index&daily=uv_index_max&timezone=auto`;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,visibility&hourly=temperature_2m,precipitation_probability,weather_code,uv_index&daily=uv_index_max&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto`;
 
+                log("Fetching: " + url.substring(0, 80) + "...");
                 const res = await fetch(url);
-                if (!res.ok) throw new Error("Weather service unavailable");
-                const data = await res.json();
+                log("Response status: " + res.status);
 
-                // Try to get city name from reverse geocoding
-                try {
-                    const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
-                    const geoData = await geoRes.json();
-                    cityName = geoData.city || geoData.locality || geoData.principalSubdivision || "Your Location";
-                } catch(e) {
-                    cityName = cityName;
+                if (!res.ok) throw new Error("Weather API returned " + res.status);
+                const data = await res.json();
+                log("Weather data received successfully");
+
+                // Only try reverse geocoding if we don't already have a city name
+                if (cityName === "Your Location") {
+                    try {
+                        const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
+                        const geoData = await geoRes.json();
+                        cityName = geoData.city || geoData.locality || geoData.principalSubdivision || "Your Location";
+                        log("Reverse geocode: " + cityName);
+                    } catch(e) {
+                        log("Reverse geocode failed: " + e.message);
+                        cityName = "Your Location";
+                    }
                 }
 
                 render(data);
             } catch (err) {
+                log("Weather fetch error: " + err.message);
                 document.getElementById("content").innerHTML = `
                     <div class="error-msg">
                         <p>⚠️ Could not load weather data</p>
                         <p style="font-size:13px;color:#a0aec0;margin-top:8px;">${err.message}</p>
                         <button onclick="fetchWeather()">Try Again</button>
+                        <div class="debug-info">
+                            <strong>Debug info:</strong><br>
+                            Lat: ${lat}<br>
+                            Lon: ${lon}<br>
+                            ${debugLog.join("<br>")}
+                        </div>
                     </div>
                 `;
             }
         }
 
         function render(data) {
+            log("render() called");
             const current = data.current;
             const hourly = data.hourly;
             const daily = data.daily;
@@ -493,15 +634,13 @@
 
             // Get next 6 hours
             const now = new Date();
-            const currentHour = now.getHours();
             const next6Hours = [];
             for (let i = 0; i < 6; i++) {
-                const hIdx = i;
                 const hourTime = new Date(now.getTime() + i * 3600000);
                 next6Hours.push({
                     time: i === 0 ? "Now" : hourTime.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }),
-                    prob: hourly.precipitation_probability[i],
-                    temp: Math.round(hourly.temperature_2m[i])
+                    prob: hourly.precipitation_probability[i] || 0,
+                    temp: Math.round(hourly.temperature_2m[i] || 0)
                 });
             }
 
@@ -547,7 +686,7 @@
             else if (uvMax <= 10) { uvStatus = "Very High"; uvClass = "status-bad"; uvAdvice = "Limit sun exposure"; }
             else { uvStatus = "Extreme"; uvClass = "status-bad"; uvAdvice = "Avoid midday sun"; }
 
-            // AQI estimate based on visibility (rough proxy)
+            // AQI estimate based on visibility
             let aqiEst = "--";
             let aqiStatus = "--";
             let aqiClass = "status-good";
@@ -637,12 +776,17 @@
                         <div class="aqi-detail">${current.visibility ? `Vis: ${visibilityKm} mi` : "No data"}</div>
                     </div>
                 </div>
+
+                <div class="debug-info">
+                    <strong>Debug:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)} | ${debugLog.slice(-3).join(" | ")}
+                </div>
             `;
 
             document.getElementById("updateTime").textContent = `Updated: ${now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
         }
 
         // Auto-load on page open
+        log("App started");
         getLocation();
     </script>
 </body>
